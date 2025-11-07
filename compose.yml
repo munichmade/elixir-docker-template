@@ -31,17 +31,6 @@ services:
 #    networks:
 #      - default
 
-#  # Standalone container for npm handling
-#  assets:
-#    build:
-#      context: .
-#      dockerfile: docker/assets/Dockerfile
-#    working_dir: /app/assets
-#    volumes:
-#      - app:/app
-#    profiles:
-#      - tools
-
 volumes:
   #  postgres-data:
   app:
