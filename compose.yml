@@ -1,15 +1,16 @@
 services:
   app:
+    init: true
     build: ./docker/app
     stdin_open: true
     tty: true
     volumes:
       - app:/app
-#    depends_on:
-#      - db
+    # depends_on:
+    #   - db
     ports:
       - 4000:4000
-    command: '/run.sh'
+    command: "/run.sh"
     networks:
       - default
 
@@ -42,7 +43,7 @@ services:
 #      - tools
 
 volumes:
-#  postgres-data:
+  #  postgres-data:
   app:
     # The lines below need to be removed when using mutagen
     driver: local
@@ -50,13 +51,3 @@ volumes:
       o: bind
       type: none
       device: .
-
-# Define synchronization when using mutagen (remove the bind mount defiinition!!!)
-#x-mutagen:
-#  sync:
-#    defaults:
-#      ignore:
-#        vcs: true
-#    app:
-#      alpha: "."
-#      beta: "volume://app"
