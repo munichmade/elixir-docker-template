@@ -19,20 +19,14 @@ help to miss some hurdles.
 ## Features
 
 - Docker based environment for Elixir / Erlang
-- Development script for easier handling of the stack
+- `justfile` for easier handling of the stack
 
 ## Prerequisites
 
 You need to have the following installed:
 
 - [Docker](https://docker.io) for running the code
-- [Mutagen](https://mutagen.io) for code syncing (optional)
-
-> Mutagen is used to overcome the slow bind mounting on platforms like macOS.
-> Note that the use of Mutagen is optional and will only be used if installed
-> and the host machine is macOS.
-> It can be enabled by providing `USE_MUTAGEN=1` as shell env var (e.g.
-> `USE_MUTAGEN=1 ./dev start`).
+- [Just](https://just.systems) for running commands
 
 ## Usage
 
@@ -41,32 +35,33 @@ or use this template as a starting point.
 
 Per default the template does start an IEx session without anything else.
 
-### Init and create a mix project
+### Initialize and create a project
 
-To use the template for a mix based environment you can use the `dev` script by
-running:
+>If you need PostreSQL you first need to uncomment the parts in `compose.yaml`
 
-```
-./dev create mix new . --app my_app  # Create a mix app name `my_app`
-```
+You can run `just create` to setup a Mix project. This will open an empty
+`${EDITOR}` instance, e.g. Neovim where you can add the installer command.
 
-> After setting up the project you likely want to change the `docker/app/run.sh`
-> script and execute `iex -S mix` instead of only `iex`.
+```bash
+mix archive.install hex igniter_new --force
+mix archive.install hex phx_new 1.8.1 --force
 
-### The `dev` script
-
-You can use the `dev` script to perform some common tasks like spinning up the
-stack.
-
-To see the supported commands you can run:
-
-```
-$ ./dev
+mix igniter.new req_is_life --with phx.new --with-args "--database sqlite3" \
+  --install ash,ash_phoenix --install ash_sqlite,ash_authentication \
+  --install ash_authentication_phoenix,ash_oban \
+  --install oban_web,live_debugger --install usage_rules \
+  --auth-strategy password --setup --yes
 ```
 
-> This will list all available commands. These can be easily extended by adding
-> new functions to either the `.dev` directory or in the `dev` script itself.
-> This is as well meant to be a starting point.
+This will install Ash with some extensions and Phoenix. The result in the
+example will be placed in the folder `req_is_life`. However it might not be
+desirable to have a separate folder. Unfortunately `igniter` does not allow
+installing in non-empty folders. To overcome this limitation you can add
+
+```bash
+shopt -s dotglob
+mv req_is_life/* .
+```
 
 ### Customization of the Docker stack
 
@@ -77,28 +72,12 @@ on container start as well as spawning a `phx.server` via the
 
 #### Renaming containers
 
-You might want to adapt the naming of the Docker stack images like use something
-more meaningful than f.e. `template-mutagen` for the sync container. Please check
+You might want to adapt the naming of the Docker stack containers like use something
+more meaningful than f.e. `app` for the application container. Please check
 and replace occurrences in the following file:
 
-- `docker-compose.yml`
-
-## Setting up a Phoenix project
-
-This is an example of what needs to be done additionally when setting up a
-Phoenix project.
-
-- Set up the project via template
-- Change the `docker-compose.yml` and comment in the DB container
-- Adapt the `docker/app/Dockerfile` and comment in the Postgres client and
-  `phx_new` part
-- Adapt the `docker/app/run.sh` script
-- Run `./dev create mix phx.new . --app app_name`
-  - Answer all question except the dependency installation with `yes`
-- Stop the stack with `./dev clean`
-- Change the `config/dev.exs` and set the database `hostname` to `db` and the
-  endpoint config to have `http: [ip: {0, 0, 0, 0}, port: 4000],`
-- Start the project with `./dev start`
+- Change `compose.yml`
+- Adapt `justfile`
 
 ## License
 
