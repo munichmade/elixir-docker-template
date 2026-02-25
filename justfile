@@ -38,6 +38,11 @@ reset:
 iex:
   @docker compose -f {{docker_compose_file}} exec app iex
 
+[doc("Run any mix command")]
+[group("dev")]
+mix *args:
+  @docker compose -f {{docker_compose_file}} exec app mix {{ args }}
+
 [doc("Run tests")]
 [group("dev")]
 test:
