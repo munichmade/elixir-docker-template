@@ -1,0 +1,33 @@
+# ============================================
+# Development Dockerfile
+# Extends the base image with dev-specific tools
+# Use this for local development
+# ============================================
+
+ARG ELIXIR_VERSION=1.19.2
+ARG OTP_VERSION=28.1
+ARG DEBIAN_VERSION=trixie-20251103-slim
+
+ARG DEV_IMAGE="docker.io/hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
+
+FROM ${DEV_IMAGE}
+
+RUN apt-get update -qq && \
+  apt-get install -y --no-install-recommends \
+    curl \
+    git \
+    make \
+    erlang-crypto \
+    inotify-tools \
+    apt-transport-https \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+RUN mix local.hex --force && \
+    mix local.rebar --force
+
+COPY docker/app/run.sh /run.sh
+RUN chmod +x /run.sh
+
+CMD ["/run.sh"]
