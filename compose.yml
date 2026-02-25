@@ -3,7 +3,8 @@ services:
     init: true
     build:
       context: .
-      dockerfile: docker/Dockerfile.dev
+      dockerfile: docker/Dockerfile
+      target: dev
     stdin_open: true
     tty: true
     volumes:
@@ -34,9 +35,8 @@ services:
 #      - default
 
 volumes:
-  #  postgres-data:
+  # postgres-data:
   app:
-    # The lines below need to be removed when using mutagen
     driver: local
     driver_opts:
       o: bind

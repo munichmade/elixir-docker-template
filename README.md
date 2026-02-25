@@ -20,6 +20,7 @@ help to miss some hurdles.
 
 - Docker based environment for Elixir / Erlang
 - `justfile` for easier handling of the stack
+- Multi-stage Dockerfile for dev and production builds
 
 ## Prerequisites
 
@@ -27,6 +28,65 @@ You need to have the following installed:
 
 - [Docker](https://docker.io) for running the code
 - [Just](https://just.systems) for running commands
+
+## Docker Build
+
+The template uses a single `docker/Dockerfile` with multiple build stages:
+
+| Stage | Purpose |
+|-------|---------|
+| `base` | Base image with essential tools |
+| `dev` | Development environment (default) |
+| `prod` | Production build environment |
+
+### Build Commands
+
+```bash
+# Development (via compose)
+just start
+
+# Production
+docker build --target prod -t myapp:prod .
+```
+
+The versions are defined in the `FROM` statement in the base stage (currently Elixir 1.19.5, Erlang 28.3, Debian trixie).
+
+### Optimized Production Build
+
+For a smaller production image, you can use a two-stage build pattern. Create a separate `Dockerfile.prod` based on the template's commented sections:
+
+```dockerfile
+# Stage 1: Builder
+FROM docker.io/hexpm/elixir:1.19.5-erlang-28.3-debian-trixie-20260202-slim AS builder
+
+WORKDIR /app
+RUN mix local.hex --force && mix local.rebar --force
+
+COPY mix.exs mix.lock ./
+RUN mix deps.get --only prod
+RUN mix deps.compile
+
+COPY config/ config/
+COPY lib/ lib/
+COPY priv/ priv/
+RUN mix compile
+
+COPY rel/ rel/
+RUN mix release
+
+# Stage 2: Runtime
+FROM debian:trixie-20260202-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  libstdc++6 openssl libncurses6 locales ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
+ENV LANG=en_US.UTF-8
+WORKDIR /app
+
+COPY --from=builder /app/_build/prod/rel/your_app ./
+CMD ["./bin/server"]
+```
 
 ## Usage
 
