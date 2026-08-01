@@ -18,7 +18,7 @@ services:
       - default
 
 #  db:
-#    image: postgres:16.3-alpine
+#    image: postgres:18.4-alpine
 #    command: 'postgres -c "max_connections=200"'
 #    ports:
 #      - 5432:5432

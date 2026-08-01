@@ -15,7 +15,7 @@
 # Stage 1: Base
 # Single source of truth for versions
 # ============================================
-FROM docker.io/hexpm/elixir:1.19.5-erlang-28.3-debian-trixie-20260202-slim AS base
+FROM docker.io/hexpm/elixir:1.20.2-erlang-29.0.3-debian-trixie-20260713-slim AS base
 
 RUN apt-get update -qq && \
   apt-get install -y --no-install-recommends \

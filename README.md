@@ -49,7 +49,7 @@ just start
 docker build --target prod -t myapp:prod .
 ```
 
-The versions are defined in the `FROM` statement in the base stage (currently Elixir 1.19.5, Erlang 28.3, Debian trixie).
+The versions are defined in the `FROM` statement in the base stage (currently Elixir 1.20.2, Erlang 29.0.3, Debian trixie).
 
 ### Optimized Production Build
 
@@ -57,7 +57,7 @@ For a smaller production image, you can use a two-stage build pattern. Create a 
 
 ```dockerfile
 # Stage 1: Builder
-FROM docker.io/hexpm/elixir:1.19.5-erlang-28.3-debian-trixie-20260202-slim AS builder
+FROM docker.io/hexpm/elixir:1.20.2-erlang-29.0.3-debian-trixie-20260713-slim AS builder
 
 WORKDIR /app
 RUN mix local.hex --force && mix local.rebar --force
@@ -75,7 +75,7 @@ COPY rel/ rel/
 RUN mix release
 
 # Stage 2: Runtime
-FROM debian:trixie-20260202-slim
+FROM debian:trixie-20260713-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
   libstdc++6 openssl libncurses6 locales ca-certificates \
@@ -104,7 +104,7 @@ You can run `just create` to setup a Mix project. This will open an empty
 
 ```bash
 mix archive.install hex igniter_new --force
-mix archive.install hex phx_new 1.8.1 --force
+mix archive.install hex phx_new 1.8.9 --force
 
 mix igniter.new req_is_life --with phx.new --with-args "--database sqlite3" \
   --install ash,ash_phoenix --install ash_sqlite,ash_authentication \
